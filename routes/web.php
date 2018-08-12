@@ -14,3 +14,22 @@
 Route::get('/', function () {
     return view('welcome');
 });
+//Route::post('car/edit', 'CarController@edit')->name('car.edit');
+//Route::post('car/store', 'CarController@store')->name('car.store');
+Route::resources([
+	'car'=>'CarController',
+    'part'=>'PartController'
+]);
+Route::get('car/{id}',function($id){
+	return view('');
+});
+
+/*
+Route::get('car', 'CarsController@index')->name('car.index');
+Route::get('car', 'CarsController@create')->name('car.create');
+Route::post('car', 'CarsController@store')->name('car.store');
+
+*/
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

@@ -17,8 +17,9 @@ class CarController extends Controller
     public function index()
     {
         //
-        $cars=\App\Car::all();
-        return view('index',compact('cars'));
+        $cars=Car::all();
+        $cars=$cars->sortBy('car_make');
+        return view('index', compact('cars'));
     }
 
     /**
@@ -30,7 +31,7 @@ class CarController extends Controller
     {
         //
         $car = new Car;
-        return view('createCar',['car' => $car,'update'=>false]);
+        return view('car.createcar', ['car' => $car,'update'=>false]);
     }
 
     /**
@@ -42,22 +43,15 @@ class CarController extends Controller
     public function store(Request $request)
     {
         //
-        $edit=$request->get('edit');
-        $carid=$request->get('carid');
-        
-        if ($edit && $carid>0){
-            $car=Car::findorFail($carid);
-
-        }else{
-              $car = new Car;   
+        $input=$request->all();
+        $carid=intval($input['carid']);
+        if ($carid) {
+            Car::update([$request,$carid]);
+        } else {
+            Car::create($input);
         }
-      
-        $car->car_name = $request->get('car_name');
-        $car->car_make = $request->get('car_make');
 
-        $car->save();
-
-        return '<a href="/"><span class="glyphicon glyphicon-home"></span> Home</a>Success';
+        return redirect()->back();
     }
 
     /**
@@ -69,7 +63,7 @@ class CarController extends Controller
     public function show($id)
     {
         //
-        return view('viewCar', ['car' => Car::findOrFail($id)]);
+        return view('car.viewcar', ['car' => Car::findOrFail($id)]);
     }
     
     /**
@@ -81,7 +75,7 @@ class CarController extends Controller
     public function edit($id)
     {
         //
-        return view('createCar', ['car' => Car::findOrFail($id),'update'=>true]);
+        return view('car.updatecar', ['car' => Car::findOrFail($id),'update'=>true]);
     }
 
     /**
@@ -94,6 +88,12 @@ class CarController extends Controller
     public function update(Request $request, $id)
     {
         //
+
+        $car=Car::findOrFail($id);
+        $input=$request->all();
+        $car->fill($input)->save();
+
+        return redirect()->route('car.index');
     }
 
     /**

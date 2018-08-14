@@ -78,13 +78,7 @@
             @endif
 
             <div class="content">
-                <div class="title m-b-md">
-                    <a href='/car'>Cars</a>
-                </div>
 
-                <div class="links">
-
-                </div>
             </div>
         </div>
     </body>

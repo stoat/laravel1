@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 use App\Car;
 use App\Part;
@@ -16,7 +17,8 @@ class PartController extends Controller
      */
     public function index()
     {
-        //
+        //  
+      
     }
 
     /**
@@ -29,7 +31,7 @@ class PartController extends Controller
         //
         $cars=Car::all();
         $part= new Part;
-        return view('createPart',['cars'=>$cars,'part'=>$part]);
+        return view('part.createpart', ['cars'=>$cars,'part'=>$part]);
     }
 
     /**
@@ -41,13 +43,12 @@ class PartController extends Controller
     public function store(Request $request)
     {
         //
-        $part = new Part;
-        $part->part_name = $request->get('part_name');
-        $part->car_id = $request->get('car_id');
+        $input=$request->all();
+        Part::create($input);
 
-        $part->save();
+        Session::flash('flash_message', 'Part successfully created!');
 
-        return 'Success';
+        return redirect()->back();
     }
 
     /**
@@ -59,6 +60,8 @@ class PartController extends Controller
     public function show($id)
     {
         //
+        $cars=Car::all();
+        return view('part.showpart', ['part' => Part::findOrFail($id),'update'=>true,'cars'=>$cars]);
     }
 
     /**
@@ -71,7 +74,7 @@ class PartController extends Controller
     {
         //
         $cars=Car::all();
-         return view('createPart', ['part' => Part::findOrFail($id),'update'=>true,'cars'=>$cars]);
+        return view('part.createpart', ['part' => Part::findOrFail($id),'update'=>true,'cars'=>$cars]);
     }
 
     /**
@@ -84,7 +87,20 @@ class PartController extends Controller
     public function update(Request $request, $id)
     {
         //
-        die(var_dump($id));
+        $part = Part::findOrFail($id);
+
+        $this->validate($request, [
+        'part_name' => 'required',
+        'car_id' => 'required'
+    ]);
+
+        $input = $request->all();
+
+        $part->fill($input)->save();
+     
+        Session::flash('flash_message', 'Part successfully updated!');
+
+        return redirect()->back();
     }
 
     /**
@@ -96,5 +112,10 @@ class PartController extends Controller
     public function destroy($id)
     {
         //
+        $part = Part::findOrFail($id);
+        $carid=$part->car->id;
+        $part->delete();
+        Session::flash('flash_message', 'Part successfully deleted!');
+        return redirect()->route('car.show', ['id'=>$carid]);
     }
 }
